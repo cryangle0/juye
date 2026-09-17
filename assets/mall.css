@@ -1,6 +1,7 @@
 /* 巨野揽月红樽：在锐涞壳上补商城/日历/C端货架，不改主色与布局节奏 */
 .login-tabs.login-tabs-3 { grid-template-columns: 1fr 1fr 1fr; }
 .login-tabs.login-tabs-wrap { display: flex; flex-wrap: wrap; }
+.login-tabs.login-tabs-wrap button { flex: 1; min-width: 30%; }
 .modal-mask { cursor: pointer; }
 .modal, .confirm-box { cursor: default; }
 
