@@ -52,9 +52,14 @@ export const actions = {
     render();
   },
   'to-mini'() {
-    ui.mode = 'mini';
     ui.loggedIn = true;
-    ui.memberId = 'm2';
+    if (ui.role === 'store') {
+      ui.mode = 'mini';
+      navigate('mini-verify');
+      return;
+    }
+    ui.mode = 'mini';
+    ui.memberId = ui.memberId && ui.memberId !== 'guest' ? ui.memberId : 'm2';
     navigate('mini-home');
   },
   'to-pc'() {
@@ -74,8 +79,19 @@ export const actions = {
   'open-modal'(el) { openModal(el.dataset.modal, { id: el.dataset.id }); },
   'apply-filter'() {
     ui.q = val('f-q');
-    ui.couponId = val('f-coupon');
+    if (document.getElementById('f-coupon')) ui.couponId = val('f-coupon');
     ui.usePoints = document.getElementById('f-points') ? checked('f-points') : ui.usePoints;
+    ui.filters ||= { zone: '', artist: '', kind: '' };
+    if (document.getElementById('f-zone')) ui.filters.zone = val('f-zone');
+    if (document.getElementById('f-artist')) ui.filters.artist = val('f-artist');
+    if (document.getElementById('f-kind')) ui.filters.kind = val('f-kind');
+    if (document.getElementById('f-fulfill')) ui.fulfill = val('f-fulfill');
+    if (document.getElementById('f-paykind')) ui.payKind = val('f-paykind');
+    render();
+  },
+  'toggle-h5'() {
+    ui.client = ui.client === 'h5' ? 'mini' : 'h5';
+    toast(ui.client === 'h5' ? '已切 H5/公众号同号通道' : '已切小程序通道');
     render();
   },
   toast(el) { toast(el.dataset.msg || '已处理'); },
@@ -115,7 +131,7 @@ export function login() {
   applyAccount(acc);
   ui.loggedIn = true;
   const hash = (location.hash || '').replace('#', '');
-  ui.route = (hash && getPage(hash) && canAccess(acc.mode, hash)) ? hash : defaultRoute(acc.mode);
+  ui.route = (hash && getPage(hash) && canAccess(acc.mode, hash)) ? hash : defaultRoute(acc.mode, acc.role);
   location.hash = ui.route;
   toast('欢迎，' + acc.name);
   render();

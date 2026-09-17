@@ -4,6 +4,7 @@ import { memberName, levelName } from '../../lib/names.js';
 export function pageVenues() {
   const { db, C } = pageCtx();
   return C.PageHeader({ title: '场地时段预约', desc: '冲突时段不可重复占用；改约/取消释放名额；成功生成到店凭证' })
+    + C.Alert({ kind: 'info', text: `代客预约人数 <input class="field-input" id="f-people" value="2" style="width:72px;display:inline-block" /> 人` })
     + C.Card({ title: '场地', body: C.Table({ columns: ['场地', '容量'], rows: db.venues.map((v) => C.tr([v.name, v.cap])) }) })
     + C.Card({
       title: '时段占用',
@@ -59,7 +60,11 @@ export function pageEvents() {
         rows: db.signups.map((s) => C.tr([
           s.id, db.events.find((e) => e.id === s.eventId)?.name, memberName(db, s.userId),
           C.Tag(s.status) + (s.queue ? ' #' + s.queue : ''), s.code || '—',
-          s.status === '成功' || s.status === '候补' ? C.Btn({ label: '取消（测递补）', action: 'cancel-sign', extra: `data-id="${s.id}"` }) : '—',
+          ['成功', '候补'].includes(s.status)
+            ? C.Ops([
+              C.Btn({ label: '取消（测递补）', action: 'cancel-sign', extra: `data-id="${s.id}"` }),
+              C.Btn({ label: '改签见面会', action: 'change-sign', extra: `data-id="${s.id}" data-event="EV2"` }),
+            ]) : '—',
         ])),
       }),
     })

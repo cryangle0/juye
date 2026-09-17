@@ -18,9 +18,10 @@ export function AdminLayout() {
   const notes = getDb().notifications || [];
   const unread = notes.filter((n) => !n.read).length;
   const switchRoles = ACCOUNTS.filter((a) => a.mode === ui.mode);
+  const homeGo = menus[0]?.items[0]?.id || 'home';
   return `<div class="app-bg"><div class="canvas">
     <header class="topbar">
-      <div class="brand" data-go="${ui.mode === 'admin' ? 'home' : menus[0].items[0].id}">
+      <div class="brand" data-go="${homeGo}">
         <img src="assets/logo.svg" alt="" /><span>巨野揽月红樽 · ${MODE_LABEL[ui.mode]}</span>
       </div>
       <div class="topbar-right">

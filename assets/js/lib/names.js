@@ -15,6 +15,9 @@ export function levelName(id) {
 export function zoneName(id) {
   return ZONES.find((z) => z.id === id)?.name || id;
 }
+export function artistName(db, id) {
+  return (db.artists || []).find((a) => a.id === id)?.name || id || '—';
+}
 export function matchQuery(row, query, keys) {
   const q = String(query || '').trim().toLowerCase();
   if (!q) return true;

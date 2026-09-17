@@ -62,6 +62,7 @@ export function pageStock() {
   return C.DataTablePage({
     title: '库存',
     desc: '下单锁库，超时未付释放。线下展厅可手工调整。',
+    actions: C.Btn({ label: '释放超时未付锁库', action: 'release-timeout', primary: true }),
     columns: ['商品', '在库', '锁定', '可售', '类型', '操作'],
     rows: db.products.map((p) => C.tr([
       C.escapeHtml(p.name), p.stock, p.locked, p.stock - p.locked,

@@ -2,7 +2,7 @@ import { MINI_MEMBERS } from './constants.js';
 
 export function seed() {
     return {
-      version: 3,
+      version: 4,
       now: '2026-09-17 14:30',
       config: {
         pointRate: 0.1,
@@ -33,12 +33,12 @@ export function seed() {
         ...m, coupons: m.id === 'm1' ? ['C-NEW'] : m.id === 'm2' ? ['C-VIP'] : [], invitedBy: m.id === 'm1' ? 'm2' : '', tags: m.id === 'm4' ? ['收藏', '仪式'] : m.id === 'm2' ? ['研学', '礼品'] : ['研学'],
       })),
       products: [
-        { id: 'P01', merchantId: 'M2', zone: 'craft', type: 'sku', name: '牡丹书签六件套', cover: '🔖', guide: 128, member: { l1: 125, l2: 122, l3: 118, l4: 112 }, stock: 86, locked: 2, status: '上架', spec: '红/金', story: '巨野牡丹纹样烫金。', freight: 8, noPoint: false },
-        { id: 'P02', merchantId: 'M2', zone: 'craft', type: 'diy', name: '牡丹团扇 DIY 材料包', cover: '🪭', guide: 198, member: { l1: 194, l2: 188, l3: 182, l4: 174 }, stock: 40, locked: 0, status: '上架', spec: '单人', story: '到店核销，工坊老师带做。', freight: 0, noPoint: false, verify: true },
-        { id: 'P03', merchantId: 'M2', zone: 'craft', type: 'card', name: '研学亲子月卡', cover: '🎫', guide: 680, member: { l1: 666, l2: 646, l3: 626, l4: 598 }, stock: 99, locked: 0, status: '上架', spec: '亲子', story: '30 日内可核销 4 次。', freight: 0, noPoint: false, verify: true, times: 4 },
-        { id: 'P04', merchantId: 'M1', zone: 'aesthetics', type: 'sku', name: '没骨牡丹小品装裱', cover: '🖼️', guide: 2680, member: { l1: 2626, l2: 2546, l3: 2466, l4: 2358 }, stock: 12, locked: 1, status: '上架', spec: '镜框', story: '画院青年画家合作款。', freight: 28, noPoint: false },
-        { id: 'P05', merchantId: 'M1', zone: 'print', type: 'sku', name: '名家限量铜版画 No.12', cover: '🖨️', guide: 12800, member: { l1: 12544, l2: 12160, l3: 11776, l4: 11264 }, stock: 8, locked: 0, status: '上架', spec: '签名版', story: '限编 50，附证书。', freight: 0, noPoint: false, limited: true, limitPer: 1, saleAt: '2026-09-17 10:00', presale: false },
-        { id: 'P06', merchantId: 'M1', zone: 'original', type: 'unique', name: '《月下红樽》原作', cover: '🌑', guide: 68000, member: { l1: 66640, l2: 64600, l3: 62560, l4: 59840 }, stock: 1, locked: 0, status: '上架', spec: '孤品', story: '一物一码 LY-2026-0007。黑钻可预约鉴赏。', freight: 0, noPoint: true, code: 'LY-2026-0007', trace: 'CZ-881920' },
+        { id: 'P01', merchantId: 'M2', zone: 'craft', type: 'sku', name: '牡丹书签六件套', cover: '🔖', guide: 128, member: { l1: 125, l2: 122, l3: 118, l4: 112 }, stock: 86, locked: 2, status: '上架', spec: '红/金', story: '巨野牡丹纹样烫金。', freight: 8, noPoint: false, artistId: 'A2' },
+        { id: 'P02', merchantId: 'M2', zone: 'craft', type: 'diy', name: '牡丹团扇 DIY 材料包', cover: '🪭', guide: 198, member: { l1: 194, l2: 188, l3: 182, l4: 174 }, stock: 40, locked: 0, status: '上架', spec: '单人', story: '到店核销，工坊老师带做。', freight: 0, noPoint: false, verify: true, artistId: 'A2' },
+        { id: 'P03', merchantId: 'M2', zone: 'craft', type: 'card', name: '研学亲子月卡', cover: '🎫', guide: 680, member: { l1: 666, l2: 646, l3: 626, l4: 598 }, stock: 99, locked: 0, status: '上架', spec: '亲子', story: '30 日内可核销 4 次。', freight: 0, noPoint: false, verify: true, times: 4, artistId: 'A2' },
+        { id: 'P04', merchantId: 'M1', zone: 'aesthetics', type: 'sku', name: '没骨牡丹小品装裱', cover: '🖼️', guide: 2680, member: { l1: 2626, l2: 2546, l3: 2466, l4: 2358 }, stock: 12, locked: 1, status: '上架', spec: '镜框', story: '画院青年画家合作款。', freight: 28, noPoint: false, artistId: 'A1' },
+        { id: 'P05', merchantId: 'M1', zone: 'print', type: 'sku', name: '名家限量铜版画 No.12', cover: '🖨️', guide: 12800, member: { l1: 12544, l2: 12160, l3: 11776, l4: 11264 }, stock: 8, locked: 0, status: '上架', spec: '签名版', story: '限编 50，附证书。', freight: 0, noPoint: false, limited: true, limitPer: 1, saleAt: '2026-09-17 10:00', presale: false, artistId: 'A1' },
+        { id: 'P06', merchantId: 'M1', zone: 'original', type: 'unique', name: '《月下红樽》原作', cover: '🌑', guide: 68000, member: { l1: 66640, l2: 64600, l3: 62560, l4: 59840 }, stock: 1, locked: 0, status: '上架', spec: '孤品', story: '一物一码 LY-2026-0007。黑钻可预约鉴赏。', freight: 0, noPoint: true, code: 'LY-2026-0007', trace: 'CZ-881920', artistId: 'A1' },
         { id: 'P07', merchantId: 'M2', zone: 'craft', type: 'sku', name: '文创帆布袋', cover: '👜', guide: 68, member: { l1: 66, l2: 64, l3: 62, l4: 59 }, stock: 0, locked: 0, status: '上架', spec: '米色', story: '售罄演示。', freight: 8, noPoint: false },
         { id: 'P08', merchantId: 'M1', zone: 'aesthetics', type: 'sku', name: '新作：金笺小品', cover: '📜', guide: 1680, member: { l1: 1646, l2: 1596, l3: 1546, l4: 1478 }, stock: 6, locked: 0, status: '待审', spec: '金笺', story: 'P 端新提交。', freight: 18, noPoint: false },
         { id: 'P09', merchantId: 'M1', zone: 'craft', type: 'ceremony', name: '全息订婚纪念套餐', cover: '💍', guide: 9800, member: { l1: 9800, l2: 9600, l3: 9400, l4: 9000 }, stock: 99, locked: 0, status: '上架', spec: '标准', story: '线上不定档，电话约档。定金 2000。', freight: 0, noPoint: false, deposit: 2000, phone: '0530-8886688' },
@@ -64,6 +64,8 @@ export function seed() {
       cart: [],
       orders: [
         { id: 'O20260915001', userId: 'm2', merchantId: 'M2', type: '购物单', status: '待发货', pay: '微信已付', payNo: 'WX20260915A', items: [{ productId: 'P01', qty: 2, price: 122 }], amount: 252, freight: 8, coupon: 0, points: 0, fulfill: '快递', created: '2026-09-15 11:20', express: '', invoice: '' },
+        { id: 'O20260917005', userId: 'm2', merchantId: 'M2', type: '购物单', status: '待支付', pay: '待支付', payNo: '', items: [{ productId: 'P01', qty: 1, price: 122 }], amount: 122, freight: 8, coupon: 0, points: 0, fulfill: '快递', created: '2026-09-16 09:00', express: '', lockedAt: '2026-09-16 09:00' },
+        { id: 'O20260911006', userId: 'm2', merchantId: 'M2', type: '核销单', status: '待核销', pay: '微信已付', payNo: 'WX20260911E', items: [{ productId: 'P03', qty: 1, price: 646 }], amount: 646, freight: 0, coupon: 0, points: 0, fulfill: '到店核销', verifyCode: 'KD-4408', timesLeft: 3, times: 4, created: '2026-09-11 10:00', express: '' },
         { id: 'O20260916002', userId: 'm1', merchantId: 'M2', type: '核销单', status: '待核销', pay: '微信已付', payNo: 'WX20260916B', items: [{ productId: 'P02', qty: 1, price: 194 }], amount: 194, freight: 0, coupon: 0, points: 0, fulfill: '到店核销', verifyCode: 'HX-8821', created: '2026-09-16 09:10', express: '' },
         { id: 'O20260912003', userId: 'm4', merchantId: 'M1', type: '购物单', status: '已完成', pay: '微信已付', payNo: 'WX20260912C', items: [{ productId: 'P04', qty: 1, price: 2358 }], amount: 2358, freight: 28, coupon: 0, points: 200, fulfill: '快递', created: '2026-09-12 16:02', express: 'SF6011223344', trace: ['已揽收', '运输中', '已签收'] },
         { id: 'O20260910004', userId: 'm3', merchantId: 'M1', type: '购物单', status: '售后中', pay: '微信已付', payNo: 'WX20260910D', items: [{ productId: 'P04', qty: 1, price: 2466 }], amount: 2466, freight: 28, coupon: 0, points: 0, fulfill: '快递', created: '2026-09-10 13:40', express: 'YT998877' },
@@ -133,14 +135,14 @@ export function seed() {
         { id: 'CU01', userId: 'm2', productId: 'P10', style: '卷轴', text: '百年好合 · 红樽揽月', material: '金笺', status: '制作中', at: '2026-09-13 10:20' },
       ],
       enterprises: [
-        { id: 'E1', name: '巨野文旅集团', credit: '91371700MA3CORP1', vipPrice: true, priority: true, master: 'corp' },
+        { id: 'E1', name: '巨野文旅集团', credit: '91371700MA3CORP1', vipPrice: true, priority: true, master: 'corp', vipPrices: { P11: 238 } },
       ],
       enterpriseUsers: [
         { id: 'corp', name: '主账号·采购总监', ent: 'E1', role: '主账号' },
         { id: 'corpsub', name: '子账号·助理', ent: 'E1', role: '子账号' },
       ],
       bulkOrders: [
-        { id: 'BO01', ent: 'E1', productId: 'P11', qty: 200, amount: 53600, status: '待对公认领', addresses: 2, at: '2026-09-14 09:00' },
+        { id: 'BO01', ent: 'E1', productId: 'P11', qty: 200, amount: 53600, status: '待对公认领', addresses: 2, addressList: ['巨野文旅大楼收发室', '菏泽办事处'], at: '2026-09-14 09:00' },
       ],
       logos: [
         { id: 'LG01', ent: 'E1', qty: 500, logo: '文旅Logo.ai', due: '2026-10-08', status: '设计确认', quote: 18600, at: '2026-09-11' },
@@ -200,6 +202,27 @@ export function seed() {
         { id: 'MSG2', to: 'm2', title: '候补中', body: '九月牡丹夜场满员，您排第 1 位', at: '2026-09-16 20:00' },
       ],
       logs: [],
+      artists: [
+        { id: 'A1', name: '王砚秋', shop: 'M1', bio: '红樽画院驻院画家，没骨牡丹。', works: 18 },
+        { id: 'A2', name: '李笺', shop: 'M2', bio: '牡丹纹样与研学课程设计。', works: 42 },
+      ],
+      media: [
+        { id: 'MD1', kind: '图', name: '书签主图', used: 'P01', status: '已审' },
+        { id: 'MD2', kind: '视频', name: '工坊过程', used: 'P02', status: '已审' },
+        { id: 'MD3', kind: '故事', name: '月下红樽创作记', used: 'P06', status: '已审' },
+      ],
+      redeemItems: [
+        { id: 'R1', name: 'DIY 体验券', cost: 80, kind: '核销凭证' },
+        { id: 'R2', name: '书签小样', cost: 40, kind: '核销凭证' },
+        { id: 'R3', name: '研学单次体验', cost: 120, kind: '核销凭证' },
+        { id: 'R4', name: '工坊茶点券', cost: 30, kind: '核销凭证' },
+        { id: 'R5', name: '展览票根', cost: 60, kind: '核销凭证' },
+        { id: 'R6', name: '金笺试笔条', cost: 50, kind: '核销凭证' },
+      ],
+      redeemVouchers: [],
+      splits: [
+        { id: 'SP01', orderId: 'O20260915001', merchantId: 'M2', goods: 252, merchant: 217, platform: 35, status: '已调甲方清分', at: '2026-09-15 11:22' },
+      ],
       roles: [
         { id: 'admin', name: '超管', menus: '*' },
         { id: 'ops', name: '运营', menus: '商品/会员/营销/预约/审核' },

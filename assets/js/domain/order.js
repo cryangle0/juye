@@ -6,7 +6,7 @@ import {
 import { checkLimited } from './catalog.js';
 import { quoteCart } from './cart.js';
 
-export function checkout(userId, couponId, usePoints, fulfill) {
+export function checkout(userId, couponId, usePoints, fulfill, payKind = 'full') {
   const q = quoteCart(userId, couponId, usePoints);
   if (!q.items.length) return fail('购物车是空的，先去选一件');
   for (const it of q.items) {
@@ -15,21 +15,29 @@ export function checkout(userId, couponId, usePoints, fulfill) {
     const lim = checkLimited(it.p, userId, it.qty);
     if (!lim.ok) return lim;
   }
+  const depositOnly = payKind === 'deposit';
+  if (depositOnly && q.items.some((it) => !it.p.presale)) return fail('购物车含非预售商品，不能只付定金');
   q.items.forEach((it) => { it.p.locked += it.qty; });
   const db = getDb();
   const orders = Object.keys(q.groups).map((mid) => {
     const its = q.groups[mid];
     const p0 = its[0].p;
     const type = p0.type === 'diy' || p0.type === 'card' ? '核销单'
-      : p0.type === 'custom' || p0.type === 'ceremony' ? '定制单' : '购物单';
+      : p0.type === 'custom' || p0.type === 'ceremony' ? '定制单'
+        : (depositOnly ? '预售单' : '购物单');
+    const amount = depositOnly
+      ? its.reduce((s, it) => s + (it.p.deposit || 0) * it.qty, 0)
+      : its.reduce((s, it) => s + it.sub, 0);
     const o = {
       id: nid('O'), userId, merchantId: mid, type, status: '待支付', pay: '待支付', payNo: '',
-      items: its.map((it) => ({ productId: it.productId, qty: it.qty, price: it.price })),
-      amount: its.reduce((s, it) => s + it.sub, 0),
-      freight: its.reduce((s, it) => s + (it.p.freight || 0), 0),
-      coupon: 0, points: 0,
+      items: its.map((it) => ({ productId: it.productId, qty: it.qty, price: depositOnly ? (it.p.deposit || 0) : it.price })),
+      amount,
+      freight: depositOnly ? 0 : its.reduce((s, it) => s + (it.p.freight || 0), 0),
+      coupon: 0, points: 0, payKind: depositOnly ? '定金' : '全款',
       fulfill: fulfill || (p0.verify ? '到店核销' : '快递'),
       created: now(), express: '', verifyCode: p0.verify ? nid('HX-') : '',
+      timesLeft: p0.type === 'card' ? (p0.times || 1) : 0,
+      times: p0.type === 'card' ? (p0.times || 1) : 0,
     };
     db.orders.unshift(o);
     db._idx.order[o.id] = o;
@@ -61,9 +69,9 @@ export function payOrder(orderId, channel = '微信') {
       if (c) { c.status = '已售'; c.owner = o.userId; }
     }
   });
-  o.status = o.verifyCode ? '待核销' : (o.type === '定制单' ? '待履约' : '待发货');
+  o.status = o.verifyCode ? '待核销' : (o.type === '定制单' || o.payKind === '定金' ? '待履约' : '待发货');
   o.pay = channel + '已付';
-  o.payNo = nid('WX');
+  o.payNo = nid(channel === '支付宝' ? 'ALI' : 'WX');
   const m = member(o.userId);
   if (m) {
     m.spend += o.amount;
@@ -76,17 +84,65 @@ export function payOrder(orderId, channel = '微信') {
     }
     addC(m.id, Math.floor(o.amount * db.config.pointRate), '获取', o.id, '消费积分');
     if (o.points) addC(m.id, -o.points, '消耗', o.id, '抵现');
+    const inv = db.invites.find((i) => i.to === o.userId && i.status === '已注册');
+    if (inv) {
+      inv.status = '已首单';
+      inv.points = 50;
+      addC(inv.from, 50, '获取', o.id, '邀请首单奖励（仅一层）');
+    }
   }
   const mer = merchant(o.merchantId);
   const tier = db.tiers.find((t) => t.id === mer.tier);
-  addP(o.merchantId, Math.floor(o.amount * (tier ? tier.rate : 0.82) * 0.02), '分成入账', o.id, '产业积分');
+  const rate = tier ? tier.rate : 0.82;
+  addP(o.merchantId, Math.floor(o.amount * rate * 0.02), '分成入账', o.id, '产业积分');
+  (db.splits ||= []).unshift({
+    id: nid('SP'), orderId: o.id, merchantId: o.merchantId,
+    goods: o.amount, merchant: Math.round(o.amount * rate), platform: Math.round(o.amount * (1 - rate)),
+    status: '已调甲方清分', at: now(),
+  });
   if (o.coupon) {
     const cp = db.coupons.find((x) => x.user === o.userId && x.status === '占用');
     if (cp) cp.status = '已用';
   }
-  audit('system', '支付', `${o.id} ${o.payNo}`);
+  audit('system', '支付', `${o.id} ${o.payNo} ${channel}`);
   save();
-  return ok('支付成功');
+  return ok(channel + '支付成功');
+}
+
+export function releaseTimeout() {
+  const db = getDb();
+  const list = db.orders.filter((o) => o.status === '待支付');
+  list.forEach((o) => cancelUnpaid(o.id));
+  return ok(list.length ? `已释放 ${list.length} 笔超时未付` : '没有超时未付订单');
+}
+
+export function simulateInviteFirstOrder(from) {
+  const db = getDb();
+  const inv = db.invites.find((i) => i.from === from && i.status === '已注册');
+  if (!inv) return fail('没有待首单的邀请，请先模拟好友用码注册');
+  const p = product('P01');
+  if (!p) return fail('无演示商品');
+  const o = {
+    id: nid('O'), userId: inv.to, merchantId: p.merchantId, type: '购物单', status: '待支付',
+    pay: '待支付', payNo: '', items: [{ productId: p.id, qty: 1, price: p.member?.l1 || p.guide }],
+    amount: p.member?.l1 || p.guide, freight: p.freight || 0, coupon: 0, points: 0,
+    fulfill: '快递', created: now(), express: '',
+  };
+  db.orders.unshift(o);
+  db._idx.order[o.id] = o;
+  save();
+  return payOrder(o.id);
+}
+
+export function applyInvoice(orderId, kind, title, tax) {
+  const o = order(orderId);
+  if (!o) return fail('无订单');
+  getDb().invoices.unshift({
+    id: nid('INV'), orderId, kind: kind || '个人', title: title || '', tax: tax || '',
+    status: '待开', no: '',
+  });
+  save();
+  return ok('发票申请已提交，待财务回填');
 }
 
 export function cancelUnpaid(orderId) {

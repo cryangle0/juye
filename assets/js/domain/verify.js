@@ -5,14 +5,30 @@ export function verifyCode(code, by = 'store') {
   const o = db.orders.find((x) => x.verifyCode === code);
   const bk = db.bookings.find((x) => x.verifyCode === code);
   const sg = db.signups.find((x) => x.code === code);
+  const rd = (db.redeemVouchers || []).find((x) => x.code === code);
   if (o) {
+    if (o.timesLeft > 1) {
+      o.timesLeft -= 1;
+      db.verifies.unshift({ id: nid('V'), code, orderId: o.id, user: member(o.userId)?.name, status: `余${o.timesLeft}次`, at: now(), by });
+      addC(o.userId, 10, '获取', o.id, '次卡核销');
+      save();
+      return ok(`核销成功，剩余 ${o.timesLeft} 次`);
+    }
     if (o.status === '已核销' || o.status === '已完成') return fail('核销码已使用，不可重复核销');
     if (o.status !== '待核销') return fail('订单状态不可核销');
     o.status = '已核销';
+    o.timesLeft = 0;
     db.verifies.unshift({ id: nid('V'), code, orderId: o.id, user: member(o.userId)?.name, status: '已核销', at: now(), by });
     addC(o.userId, 20, '获取', o.id, '到店核销奖励');
     save();
     return ok('核销成功 ' + o.id);
+  }
+  if (rd) {
+    if (rd.status === '已核销') return fail('兑换凭证已核销');
+    rd.status = '已核销';
+    db.verifies.unshift({ id: nid('V'), code, orderId: rd.id, user: member(rd.userId)?.name, status: '已核销', at: now(), by });
+    save();
+    return ok('兑换凭证核销成功');
   }
   if (bk) {
     if (bk.status === '已核销') return fail('预约凭证已核销');

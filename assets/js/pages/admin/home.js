@@ -45,7 +45,7 @@ export function pageHome() {
     ])}</div>`
     + C.Card({
       title: '快捷入口',
-      body: `<div class="shortcut-grid">${[['商品库', 'product'], ['订单', 'orders'], ['会员', 'members'], ['营销券', 'coupons'], ['核销', 'verify-records'], ['经营大盘', 'dashboard']].map(([t, g]) =>
+      body: `<div class="shortcut-grid">${[['商品库', 'product'], ['订单', 'orders'], ['会员', 'members'], ['营销券', 'coupons'], ['积分兑换', 'redeem'], ['分账流水', 'splits'], ['画师档案', 'artists'], ['核销', 'verify-records'], ['经营大盘', 'dashboard']].map(([t, g]) =>
         `<button class="shortcut-card" data-go="${g}"><span class="ico">▣</span>${t}</button>`).join('')}</div>`,
     });
 }

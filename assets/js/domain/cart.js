@@ -47,3 +47,20 @@ export function quoteCart(userId, couponId, usePoints) {
 export function cartCount(userId) {
   return getDb().cart.filter((c) => c.userId === userId).reduce((s, c) => s + c.qty, 0);
 }
+
+export function changeCart(userId, productId, delta) {
+  const db = getDb();
+  const row = db.cart.find((c) => c.userId === userId && c.productId === productId);
+  if (!row) return fail('购物车没有这件');
+  row.qty += Number(delta || 0);
+  if (row.qty <= 0) db.cart = db.cart.filter((c) => c !== row);
+  save();
+  return ok('购物车已更新');
+}
+
+export function removeCart(userId, productId) {
+  const db = getDb();
+  db.cart = db.cart.filter((c) => !(c.userId === userId && c.productId === productId));
+  save();
+  return ok('已移除');
+}

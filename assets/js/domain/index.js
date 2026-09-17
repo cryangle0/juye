@@ -8,3 +8,4 @@ export * from './enterprise.js';
 export * from './resource.js';
 export * from './marketing.js';
 export * from './finance.js';
+export * from './redeem.js';

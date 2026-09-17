@@ -1,5 +1,5 @@
 import { pageCtx } from '../context.js';
-import { memberName, merchantName } from '../../lib/names.js';
+import { memberName, merchantName, matchQuery } from '../../lib/names.js';
 import { money } from '../../lib/format.js';
 
 export function pageCoupons() {
@@ -80,11 +80,13 @@ export function pageTraces() {
 }
 
 export function pageLogs() {
-  const { db, C } = pageCtx();
+  const { ui, db, C } = pageCtx();
+  const list = (db.audits || []).filter((a) => matchQuery(a, ui.q, ['who', 'action', 'cat', 'at']));
   return C.DataTablePage({
     title: '操作日志 / 审计',
-    desc: '入驻审核、改价、退款、分账、预约改档、对公认领只追加不可改。',
+    desc: '入驻审核、改价、退款、分账、预约改档、对公认领只追加不可改。按人/单/时间检索。',
+    search: { value: ui.q, placeholder: '操作人 / 分类 / 内容' },
     columns: ['时间', '分类', '操作人', '内容'],
-    rows: db.audits.map((a) => C.tr([a.at, C.Tag(a.cat, 'blue'), a.who, C.escapeHtml(a.action)])),
+    rows: list.map((a) => C.tr([a.at, C.Tag(a.cat, 'blue'), a.who, C.escapeHtml(a.action)])),
   });
 }

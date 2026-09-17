@@ -6,14 +6,14 @@ import { money } from '../../lib/format.js';
 export function pageMiniBook() {
   const { db, C } = pageCtx();
   return `<div class="mini-page-title">场地预约</div>
-    <p class="mini-page-desc">冲突时段不可占用，取消后名额释放。</p>
+    <p class="mini-page-desc">冲突时段不可占用，取消后名额释放。人数 <input class="field-input" id="f-people" value="2" style="width:64px;display:inline-block" /></p>
     ${db.slots.map((s) => {
       const v = db.venues.find((x) => x.id === s.venueId);
       const full = s.used >= s.cap;
       return `<div class="mini-sn-card" style="margin-bottom:8px">
         <strong>${v.name}</strong>
         <div class="muted">${s.date} ${s.time} · ${s.used}/${s.cap}</div>
-        ${C.Btn({ label: full ? '已满（点我看冲突）' : '预约 2 人', action: 'book-slot', extra: `data-id="${s.id}"`, primary: !full, size: 'sm' })}
+        ${C.Btn({ label: full ? '已满（点我看冲突）' : '预约', action: 'book-slot', extra: `data-id="${s.id}"`, primary: !full, size: 'sm' })}
       </div>`;
     }).join('')}
     <h4>我的预约</h4>
@@ -34,7 +34,10 @@ export function pageMiniEvent() {
     + `<h4>我的报名</h4>`
     + db.signups.filter((s) => s.userId === ui.memberId).map((s) => {
       const e = db.events.find((x) => x.id === s.eventId);
-      return `<div class="mini-sn-card">${e?.name} ${C.Tag(s.status)} ${s.code || ''} ${['成功', '候补'].includes(s.status) ? C.Btn({ label: '取消', action: 'cancel-sign', extra: `data-id="${s.id}"`, size: 'sm' }) : ''}</div>`;
+      return `<div class="mini-sn-card">${e?.name} ${C.Tag(s.status)} ${s.code || ''}
+        ${['成功', '候补'].includes(s.status) ? C.Btn({ label: '取消', action: 'cancel-sign', extra: `data-id="${s.id}"`, size: 'sm' }) : ''}
+        ${['成功', '候补'].includes(s.status) ? C.Btn({ label: '改签见面会', action: 'change-sign', extra: `data-id="${s.id}" data-event="EV2"`, size: 'sm' }) : ''}
+      </div>`;
     }).join('');
 }
 

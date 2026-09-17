@@ -59,4 +59,26 @@ export const TITLES = {
   'mini-custom': '定制', 'mini-review': '评价', 'mini-ugc': '打卡', 'mini-invite': '邀请',
   'mini-limited': '限量', 'mini-verify': '核销', 'mini-msg': '消息',
   'mini-privacy': '隐私与注销',
+  artists: '画师档案', media: '素材库', splits: '分账流水', redeem: '积分兑换物',
+  'e-invoice': '专票申请', 'p-event': '共创报名',
+  'mini-redeem': '积分兑换', 'mini-nft': '数字藏品', 'mini-artist': '画师',
+  'mini-invoice': '发票',
+};
+
+/** 固定角色包可见页面；超管不限制 */
+export const ROLE_ALLOW = {
+  ops: [
+    'home', 'dashboard', 'merchants', 'roles', 'members', 'level-config', 'points',
+    'product', 'product-audit', 'prices', 'stock', 'codes', 'orders', 'aftersales',
+    'logistics', 'verify-records', 'coupons', 'newbie', 'redeem', 'traces',
+    'venues', 'events', 'messages', 'ceremonies', 'customs',
+    'bulk', 'logos', 'inquiries', 'enterprises', 'claims', 'limited',
+    'reviews', 'ugc', 'invites', 'tags', 'resources', 'launches', 'exchanges',
+    'logs', 'audits', 'artists', 'media', 'reports-goods', 'reports-member',
+  ],
+  finance: [
+    'dashboard', 'bills', 'withdraws', 'recon', 'invoices', 'claims', 'logs', 'audits',
+    'reports-finance', 'points', 'orders', 'splits',
+  ],
+  cs: ['home', 'orders', 'aftersales', 'messages', 'verify-records', 'reviews', 'members', 'ugc'],
 };

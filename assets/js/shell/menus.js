@@ -1,4 +1,6 @@
 import { getDb } from '../lib/store.js';
+import { ui } from '../app/state.js';
+import { ROLE_ALLOW } from '../data/constants.js';
 
 function badge(list) { return list.length || null; }
 
@@ -13,6 +15,7 @@ export function adminMenus() {
       { id: 'merchants', title: '商家入驻', icon: '①', badge: badge(d.merchants.filter((m) => m.status === '待审')) },
       { id: 'roles', title: '角色权限', icon: '⚙' },
       { id: 'members', title: '会员等级', icon: '☺' },
+      { id: 'level-config', title: '升降级阈值', icon: '⚙' },
       { id: 'points', title: '双积分', icon: '◎' },
     ]},
     { group: '一期 · 商品订单', items: [
@@ -21,6 +24,8 @@ export function adminMenus() {
       { id: 'prices', title: '价格中心', icon: '¥' },
       { id: 'stock', title: '库存', icon: '▦' },
       { id: 'codes', title: '一物一码', icon: '#' },
+      { id: 'artists', title: '画师档案', icon: '☺' },
+      { id: 'media', title: '素材库', icon: '▣' },
       { id: 'orders', title: '订单中心', icon: '▥' },
       { id: 'aftersales', title: '退款退货', icon: '↩', badge: badge(d.aftersales.filter((a) => a.status === '待审' || a.status === '待运营放行')) },
       { id: 'logistics', title: '物流轨迹', icon: '→' },
@@ -30,10 +35,12 @@ export function adminMenus() {
     { group: '一期 · 营销财务', items: [
       { id: 'coupons', title: '营销券', icon: '✁' },
       { id: 'newbie', title: '新人礼', icon: '✦' },
+      { id: 'redeem', title: '积分兑换物', icon: '◎' },
       { id: 'bills', title: '月对账单', icon: '▣' },
       { id: 'withdraws', title: '分账提现', icon: '¥', badge: badge(d.withdraws.filter((w) => w.status === '待财务审')) },
       { id: 'recon', title: '支付对账', icon: '=', badge: badge(d.recon.filter((r) => r.diff)) },
       { id: 'traces', title: '溯源查询', icon: '◎' },
+      { id: 'splits', title: '分账流水', icon: '¥' },
       { id: 'logs', title: '操作日志', icon: '≡' },
     ]},
     { group: '二期 · 预约仪式', items: [
@@ -83,6 +90,7 @@ export function merchantMenus() {
       { id: 'p-exchange', title: '积分兑排期', icon: '◎' },
       { id: 'p-resource', title: '申请档期', icon: '▦' },
       { id: 'p-launch', title: '新品提报', icon: '★' },
+      { id: 'p-event', title: '共创报名', icon: '★' },
       { id: 'p-reviews', title: '评价回复', icon: '✎' },
     ]},
   ];
@@ -97,6 +105,7 @@ export function enterpriseMenus() {
       { id: 'e-inquiry', title: '大额询价', icon: '?' },
       { id: 'e-users', title: '子账号', icon: '☺' },
       { id: 'e-claim', title: '对公进度', icon: '¥' },
+      { id: 'e-invoice', title: '专票申请', icon: '▤' },
     ]},
   ];
 }
@@ -139,9 +148,20 @@ export function menusFor(mode) {
   if (mode === 'merchant') return merchantMenus();
   if (mode === 'enterprise') return enterpriseMenus();
   if (mode === 'store') return storeMenus();
-  return adminMenus();
+  const all = adminMenus();
+  const allow = ROLE_ALLOW[ui.role];
+  if (!allow) return all;
+  const set = new Set(allow);
+  return all
+    .map((g) => ({ ...g, items: g.items.filter((it) => set.has(it.id)) }))
+    .filter((g) => g.items.length);
 }
 
-export function defaultRoute(mode) {
-  return { admin: 'home', merchant: 'p-home', enterprise: 'e-home', store: 's-verify', mini: 'mini-home' }[mode] || 'home';
+export function defaultRoute(mode, role) {
+  if (mode === 'admin') {
+    if (role === 'finance') return 'dashboard';
+    if (role === 'cs') return 'orders';
+    return 'home';
+  }
+  return { merchant: 'p-home', enterprise: 'e-home', store: 's-verify', mini: 'mini-home' }[mode] || 'home';
 }

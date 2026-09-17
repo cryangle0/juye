@@ -22,6 +22,12 @@ export const ui = {
   orderId: '',
   couponId: '',
   usePoints: true,
+  filters: { zone: '', artist: '', kind: '' },
+  channel: '微信',
+  fulfill: '快递',
+  payKind: 'full',
+  client: 'mini',
+  artistId: 'A1',
 };
 
 export function applyAccount(acc) {

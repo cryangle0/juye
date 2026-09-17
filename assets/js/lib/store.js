@@ -1,6 +1,6 @@
 import { seed } from '../data/seed.js';
 
-const KEY = 'juye_proto_v3';
+const KEY = 'juye_proto_v4';
 const SAVE_MS = 80;
 
 let db = null;
@@ -73,8 +73,7 @@ export function load() {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed.version === 3 || parsed.version === 2) {
-        parsed.version = 3;
+      if (parsed.version === 4) {
         db = parsed;
         reindex(db);
         return db;
@@ -82,7 +81,7 @@ export function load() {
     }
   } catch (_) {}
   db = seed();
-  db.version = 3;
+  db.version = 4;
   reindex(db);
   save(true);
   return db;
@@ -91,7 +90,7 @@ export function load() {
 export function reset() {
   localStorage.removeItem(KEY);
   db = seed();
-  db.version = 3;
+  db.version = 4;
   seq = 200;
   reindex(db);
   save(true);

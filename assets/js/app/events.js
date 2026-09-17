@@ -5,7 +5,7 @@ import { dispatch, login } from '../actions/index.js';
 import { render } from './render.js';
 
 const GO_PRODUCT = new Set(['mini-detail', 'mini-review']);
-const GO_ORDER = new Set(['mini-order', 'mini-pay']);
+const GO_ORDER = new Set(['mini-order', 'mini-pay', 'mini-invoice']);
 
 let qTimer = 0;
 
@@ -48,6 +48,7 @@ function onClick(e) {
     if (t.dataset.id) {
       if (GO_PRODUCT.has(t.dataset.go)) ui.productId = t.dataset.id;
       if (GO_ORDER.has(t.dataset.go)) ui.orderId = t.dataset.id;
+      if (t.dataset.go === 'mini-artist') ui.artistId = t.dataset.id;
       if (t.dataset.go === 'mini-zone') ui.tabs.zone = t.dataset.id;
     }
     navigate(t.dataset.go);
@@ -93,6 +94,7 @@ function onInput(e) {
 }
 
 function onChange(e) {
+  ui.filters ||= { zone: '', artist: '', kind: '' };
   if (e.target.id === 'f-coupon') {
     ui.couponId = e.target.value;
     render();
@@ -101,6 +103,11 @@ function onChange(e) {
     ui.usePoints = e.target.checked;
     render();
   }
+  if (e.target.id === 'f-zone') ui.filters.zone = e.target.value;
+  if (e.target.id === 'f-artist') ui.filters.artist = e.target.value;
+  if (e.target.id === 'f-kind') ui.filters.kind = e.target.value;
+  if (e.target.id === 'f-fulfill') ui.fulfill = e.target.value;
+  if (e.target.id === 'f-paykind') ui.payKind = e.target.value;
 }
 
 export function bindEvents() {

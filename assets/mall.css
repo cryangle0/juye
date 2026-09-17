@@ -180,6 +180,9 @@
 }
 .nav-item.active .menu-badge { background: #fff; color: var(--primary-deep); }
 
+.mini-filters { display: grid; gap: 8px; margin: 8px 0; }
+.qty-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+
 .pc-subtop {
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
 }

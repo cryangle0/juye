@@ -46,11 +46,15 @@ export function signupEvent(userId, eventId) {
   const db = getDb();
   const e = db.events.find((x) => x.id === eventId);
   const m = member(userId);
-  if (!e || !m) return fail('无法报名');
-  const need = LEVELS.find((l) => l.id === e.need);
-  const have = LEVELS.find((l) => l.id === m.level);
-  if (need && have && LEVELS.indexOf(have) < LEVELS.indexOf(need)) return fail('等级不足，专场资格已拦截');
-  if (e.tags?.length && !(m.tags || []).some((t) => e.tags.includes(t))) return fail('标签不符，已拦截');
+  const mer = db.merchants.find((x) => x.id === userId);
+  if (!e || (!m && !mer)) return fail('无法报名');
+  if (mer && !m && !e.mix) return fail('该场次不对商家开放');
+  if (m) {
+    const need = LEVELS.find((l) => l.id === e.need);
+    const have = LEVELS.find((l) => l.id === m.level);
+    if (need && have && LEVELS.indexOf(have) < LEVELS.indexOf(need)) return fail('等级不足，专场资格已拦截');
+    if (e.tags?.length && !(m.tags || []).some((t) => e.tags.includes(t))) return fail('标签不符，已拦截');
+  }
   if (db.signups.some((s) => s.eventId === eventId && s.userId === userId && s.status !== '已取消')) return fail('已报名');
   if (e.used < e.cap) {
     e.used += 1;
@@ -89,4 +93,14 @@ export function cancelSignup(id) {
   if (was === '候补' && e) e.wait = Math.max(0, e.wait - 1);
   save();
   return ok(was === '成功' ? '已取消，名额已补给候补' : '已退出候补');
+}
+
+export function changeSignup(id, eventId) {
+  const s = getDb().signups.find((x) => x.id === id);
+  if (!s || !['成功', '候补'].includes(s.status)) return fail('无法改签');
+  if (s.eventId === eventId) return fail('已在该场次');
+  const joined = signupEvent(s.userId, eventId);
+  if (!joined.ok) return joined;
+  cancelSignup(id);
+  return ok('已改签到新场次');
 }

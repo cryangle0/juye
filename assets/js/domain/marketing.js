@@ -22,10 +22,17 @@ export function ugcPass(id, pass) {
 
 export function inviteAccept(from, to) {
   const db = getDb();
-  if (db.invites.some((i) => i.to === to)) return fail('该用户已被邀请过（仅一层）');
-  db.invites.unshift({ id: nid('IN'), from, to, status: '已注册', points: 0 });
+  const uid = to || nid('m');
+  if (db.invites.some((i) => i.to === uid)) return fail('该用户已被邀请过（仅一层）');
+  if (!db.members.find((m) => m.id === uid)) {
+    db.members.push({
+      id: uid, name: '新客·一层', role: 'member', level: 'l1', phone: '13900001999',
+      spend: 0, growth: 0, cPoints: 0, birthday: '01-01', coupons: [], invitedBy: from, tags: [],
+    });
+  }
+  db.invites.unshift({ id: nid('IN'), from, to: uid, status: '已注册', points: 0 });
   save();
-  return ok('邀请绑定成功，待首单发分');
+  return ok('邀请绑定成功，待首单发分', { to: uid });
 }
 
 export function grantCoupon(userId, tplId = 'TPL1') {

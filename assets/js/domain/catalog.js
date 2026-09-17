@@ -13,6 +13,10 @@ export function canSeeZone(levelId, zone) {
   return lv.zones.includes(zone);
 }
 
+export function canSeeNft(levelId) {
+  return !!LEVELS.find((l) => l.id === levelId)?.nft;
+}
+
 export function priceOf(p, levelId) {
   if (!p) return 0;
   const db = getDb();

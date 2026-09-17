@@ -14,11 +14,18 @@ export function pageEHome() {
 
 export function pageEBulk() {
   const { db, C } = pageCtx();
+  const current = db.bulkOrders[0];
   return C.DataTablePage({
     title: '节庆伴手礼批量',
-    actions: C.Btn({ label: '再下一单', action: 'e-bulk-new', primary: true }),
-    columns: ['单号', '商品', '数量', '金额', '状态'],
-    rows: db.bulkOrders.map((b) => C.tr([b.id, productName(db, b.productId), b.qty, money(b.amount), C.Tag(b.status)])),
+    desc: '走专属价；每行一个分送地址。开票走专票申请。',
+    actions: C.Btn({ label: '再下一单（专属价）', action: 'e-bulk-new', primary: true }),
+    columns: ['单号', '商品', '数量', '金额', '地址数', '状态'],
+    rows: db.bulkOrders.map((b) => C.tr([b.id, productName(db, b.productId), b.qty, money(b.amount), b.addresses || (b.addressList || []).length, C.Tag(b.status)])),
+    extra: current ? C.Card({
+      title: '分送地址导入 · ' + current.id,
+      body: `<textarea class="field-input" id="f-addr" rows="4">${C.escapeHtml((current.addressList || []).join('\n'))}</textarea>`
+        + C.Btn({ label: '导入地址', action: 'import-addr', extra: `data-id="${current.id}"`, primary: true, size: 'sm' }),
+    }) : '',
   });
 }
 
@@ -58,4 +65,23 @@ export function pageEClaim() {
     columns: ['金额', '附言', '状态'],
     rows: db.claims.map((c) => C.tr([money(c.amount), C.escapeHtml(c.memo), C.Tag(c.status)])),
   });
+}
+
+export function pageEInvoice() {
+  const { db, C } = pageCtx();
+  const e = db.enterprises.find((x) => x.id === 'E1') || db.enterprises[0];
+  const mine = db.invoices.filter((i) => i.kind === '专票' || i.title === e?.name);
+  return C.PageHeader({ title: '增值税专票申请', desc: '信息登记，开具仍财务回填，不接税控。' })
+    + C.Card({
+      body: C.Kv([['抬头', e?.name], ['税号', e?.credit]])
+        + C.Field({ label: '关联订单', inner: C.Input({ id: 'f-oid', value: db.bulkOrders[0]?.id || '' }) })
+        + C.Btn({ label: '提交专票申请', action: 'e-vat', primary: true, size: '' }),
+    })
+    + C.Card({
+      title: '申请记录',
+      body: C.Table({
+        columns: ['申请', '订单', '状态', '票号'],
+        rows: mine.map((i) => C.tr([i.id, i.orderId || '—', C.Tag(i.status), i.no || '待回填'])),
+      }),
+    });
 }

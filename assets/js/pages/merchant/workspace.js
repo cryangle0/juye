@@ -143,3 +143,27 @@ export function pagePReviews() {
     ])),
   });
 }
+
+export function pagePEvent() {
+  const { db, C } = pageCtx();
+  const mix = db.events.filter((e) => e.mine || e.mix);
+  const mine = db.signups.filter((s) => s.userId === mid());
+  return C.PageHeader({ title: '共创 / 新品发布报名', desc: 'P/C 混合场次。资格不符直接拦截。名单可导出。' })
+    + C.Card({
+      body: C.Table({
+        columns: ['活动', '时间', '名额', '操作'],
+        rows: mix.map((e) => C.tr([
+          C.escapeHtml(e.name), e.date, `${e.used}/${e.cap}`,
+          C.Btn({ label: '商家报名', action: 'p-signup', extra: `data-id="${e.id}"`, primary: true }),
+        ])),
+      }),
+    })
+    + C.Card({
+      title: '本店报名',
+      body: mine.map((s) => {
+        const e = db.events.find((x) => x.id === s.eventId);
+        return `<div>${C.escapeHtml(e?.name || '')} ${C.Tag(s.status)} ${s.code || ''}</div>`;
+      }).join('') || '暂无',
+    })
+    + C.Btn({ label: '导出签到名单', action: 'export-sign', size: '' });
+}

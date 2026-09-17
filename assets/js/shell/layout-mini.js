@@ -7,7 +7,9 @@ import { MINI_ICONS } from '../components/mini.js';
 
 function chips() {
   if (ui.mode !== 'mini') return '';
-  return `<div class="mini-role-switch">${MINI_MEMBERS.map((m) =>
+  return `<div class="mini-role-switch">
+    <button type="button" class="mini-role-chip on" data-action="toggle-h5">${ui.client === 'h5' ? 'H5同号' : '小程序'}</button>
+    ${MINI_MEMBERS.map((m) =>
     `<button type="button" class="mini-role-chip ${ui.memberId === m.id ? 'on' : ''}" data-action="mini-member" data-id="${m.id}">${escapeHtml(m.name.slice(-2))}</button>`
   ).join('')}</div>`;
 }
@@ -19,8 +21,8 @@ export function MiniLayout() {
   const active = (id) => {
     if (id === 'mini-home') return ui.route === 'mini-home' || ui.route === 'mini-zone' || ui.route === 'mini-search';
     if (id === 'mini-cart') return ['mini-cart', 'mini-checkout', 'mini-pay'].includes(ui.route);
-    if (id === 'mini-wallet') return ['mini-wallet', 'mini-points', 'mini-book', 'mini-event'].includes(ui.route);
-    if (id === 'mini-mine') return ui.route.startsWith('mini-mine') || ui.route === 'mini-orders' || ui.route === 'mini-order';
+    if (id === 'mini-wallet') return ['mini-wallet', 'mini-points', 'mini-book', 'mini-event', 'mini-redeem'].includes(ui.route);
+    if (id === 'mini-mine') return ui.route.startsWith('mini-mine') || ['mini-orders', 'mini-order', 'mini-invoice', 'mini-nft', 'mini-privacy', 'mini-invite', 'mini-msg'].includes(ui.route);
     return ui.route === id;
   };
   return `<div class="mini-stage">

@@ -58,7 +58,10 @@ export function pageMembers() {
         rows: db.members.filter((m) => matchQuery(m, ui.q, ['name', 'phone'])).map((m) => C.tr([
           C.escapeHtml(m.name), m.phone, C.Tag(levelName(m.level), 'green'),
           money(m.spend), m.cPoints, (m.tags || []).map((t) => C.Tag(t, 'blue')).join(' '),
-          C.Btn({ label: '流水', action: 'open-modal', extra: `data-modal="member" data-id="${m.id}"` }),
+          C.Ops([
+            C.Btn({ label: '流水', action: 'open-modal', extra: `data-modal="member" data-id="${m.id}"` }),
+            C.Btn({ label: '生日礼', action: 'grant-birthday', extra: `data-id="${m.id}"` }),
+          ]),
         ])),
       }),
     });
@@ -90,7 +93,10 @@ export function pagePoints() {
   return C.DataTablePage({
     title: '双积分账本',
     desc: 'C / P 分账本，禁止混清算。互通按可配汇率划转。',
-    actions: C.Btn({ label: '演示划转', action: 'point-transfer', primary: true }),
+    actions: C.Ops([
+      C.Btn({ label: '演示划转', action: 'point-transfer', primary: true }),
+      C.Btn({ label: '演示过期 10 分', action: 'expire-points' }),
+    ]),
     tabs: { key: 'points', current: tab, items: [{ id: 'c', title: 'C 端消费积分' }, { id: 'p', title: 'P 端产业积分' }] },
     columns: ['时间', '账户', '类型', '变动', '订单', '备注'],
     rows,

@@ -12,8 +12,9 @@ export function pageOrders() {
     desc: '购物单 / 核销单 / 卡券单统一。定制单走二期流程。',
     tabs: {
       key: 'orders', current: tab,
-      items: ['all', '待支付', '待发货', '待核销', '售后中', '已完成'].map((id) => ({ id, title: id === 'all' ? '全部' : id })),
+      items: ['all', '待支付', '待发货', '待核销', '待履约', '售后中', '已完成'].map((id) => ({ id, title: id === 'all' ? '全部' : id })),
     },
+    actions: C.Btn({ label: '释放超时未付', action: 'release-timeout' }),
     search: { value: ui.q, placeholder: '单号' },
     columns: ['单号', '会员', '商家', '类型', '实付', '履约', '状态', '操作'],
     rows: list.map((o) => C.tr([

@@ -29,12 +29,15 @@ export function claimPay(id, who) {
 }
 
 export function addBulk(ent, qty = 50) {
-  getDb().bulkOrders.unshift({
-    id: nid('BO'), ent, productId: 'P11', qty, amount: 268 * qty,
-    status: '待对公认领', addresses: 1, at: now(),
+  const db = getDb();
+  const e = db.enterprises.find((x) => x.id === ent);
+  const unit = Number(e?.vipPrices?.P11 || 268);
+  db.bulkOrders.unshift({
+    id: nid('BO'), ent, productId: 'P11', qty, amount: unit * qty,
+    status: '待对公认领', addresses: 1, addressList: [], at: now(), unit,
   });
   save();
-  return ok('批量单已创建');
+  return ok(e?.vipPrices?.P11 ? `批量单已创建（专属价 ¥${unit}）` : '批量单已创建');
 }
 
 export function addInquiry(ent, title) {
@@ -71,4 +74,35 @@ export function fillInvoice(id, no) {
   i.status = '已回填';
   save();
   return ok('票号已回填');
+}
+
+export function importAddresses(id, text) {
+  const b = getDb().bulkOrders.find((x) => x.id === id);
+  if (!b) return fail('无批量单');
+  const lines = String(text || '').split(/\n/).map((s) => s.trim()).filter(Boolean);
+  if (!lines.length) return fail('请每行一个地址');
+  b.addressList = lines;
+  b.addresses = lines.length;
+  save();
+  return ok(`已导入 ${lines.length} 个分送地址`);
+}
+
+export function applyVat(entId, orderId) {
+  const e = getDb().enterprises.find((x) => x.id === entId);
+  if (!e) return fail('无企业');
+  getDb().invoices.unshift({
+    id: nid('INV'), orderId: orderId || '', kind: '专票', title: e.name, tax: e.credit, status: '待开', no: '',
+  });
+  save();
+  return ok('专票申请已提交，待财务回填');
+}
+
+export function hangVipPrice(entId, productId, price) {
+  const e = getDb().enterprises.find((x) => x.id === entId);
+  if (!e) return fail('无企业');
+  e.vipPrices = e.vipPrices || {};
+  e.vipPrices[productId] = Number(price);
+  e.vipPrice = true;
+  save();
+  return ok(`已挂专属价 ${productId} ¥${price}`);
 }

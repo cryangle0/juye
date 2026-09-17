@@ -7,9 +7,10 @@ export function pageBulk() {
   return C.DataTablePage({
     title: '政企批量下单',
     desc: '标准化节庆套餐、批量数量、分送地址导入。',
-    columns: ['单号', '企业', '商品', '数量', '金额', '状态'],
+    columns: ['单号', '企业', '商品', '数量', '金额', '分送地址', '状态'],
     rows: db.bulkOrders.map((b) => C.tr([
-      b.id, db.enterprises.find((e) => e.id === b.ent)?.name, productName(db, b.productId), b.qty, money(b.amount), C.Tag(b.status),
+      b.id, db.enterprises.find((e) => e.id === b.ent)?.name, productName(db, b.productId), b.qty, money(b.amount),
+      (b.addressList || []).length || b.addresses || 0, C.Tag(b.status),
     ])),
   });
 }
@@ -52,6 +53,13 @@ export function pageEnterprises() {
       e.name, e.credit, e.vipPrice ? C.Tag('绿色通道', 'green') : '—', e.priority ? C.Tag('加急', 'orange') : '—',
       db.enterpriseUsers.filter((u) => u.ent === e.id).map((u) => `${u.name}（${u.role}）`).join('、'),
     ])),
+    extra: C.Card({
+      title: '挂专属价',
+      body: `商品 <input class="field-input" id="f-pid" value="P11" style="width:100px;display:inline-block" />
+        单价 <input class="field-input" id="f-vip" value="238" style="width:100px;display:inline-block" />
+        ${C.Btn({ label: '保存专属价', action: 'hang-vip', primary: true, size: 'sm' })}
+        <div class="muted" style="margin-top:8px">当前 P11：¥${db.enterprises[0]?.vipPrices?.P11 || '—'}</div>`,
+    }),
   });
 }
 

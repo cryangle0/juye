@@ -5,6 +5,7 @@ import * as trade from './admin/trade.js';
 import * as finance from './admin/finance.js';
 import * as booking from './admin/booking.js';
 import * as phase2 from './admin/phase2.js';
+import * as extras from './admin/extras.js';
 import * as content from './admin/content.js';
 import * as merchant from './merchant/workspace.js';
 import * as ent from './enterprise/workspace.js';
@@ -39,7 +40,11 @@ const PAGES = {
   dashboard: finance.pageDashboard,
   traces: finance.pageTraces,
   logs: finance.pageLogs,
-  audits: finance.pageLogs,
+  audits: extras.pageAudits,
+  artists: extras.pageArtists,
+  media: extras.pageMedia,
+  redeem: extras.pageRedeem,
+  splits: extras.pageSplits,
   venues: booking.pageVenues,
   events: booking.pageEvents,
   messages: booking.pageMessages,
@@ -73,12 +78,14 @@ const PAGES = {
   'p-resource': merchant.pagePResource,
   'p-launch': merchant.pagePLaunch,
   'p-reviews': merchant.pagePReviews,
+  'p-event': merchant.pagePEvent,
   'e-home': ent.pageEHome,
   'e-bulk': ent.pageEBulk,
   'e-logo': ent.pageELogo,
   'e-inquiry': ent.pageEInquiry,
   'e-users': ent.pageEUsers,
   'e-claim': ent.pageEClaim,
+  'e-invoice': ent.pageEInvoice,
   's-verify': store.pageSVerify,
   's-shift': store.pageSShift,
   'mini-home': miniShop.pageMiniHome,
@@ -86,14 +93,18 @@ const PAGES = {
   'mini-search': miniShop.pageMiniSearch,
   'mini-detail': miniShop.pageMiniDetail,
   'mini-trace': miniShop.pageMiniTrace,
+  'mini-artist': miniShop.pageMiniArtist,
+  'mini-nft': miniShop.pageMiniNft,
   'mini-cart': miniTrade.pageMiniCart,
   'mini-checkout': miniTrade.pageMiniCheckout,
   'mini-pay': miniTrade.pageMiniPay,
   'mini-orders': miniTrade.pageMiniOrders,
   'mini-order': miniTrade.pageMiniOrder,
+  'mini-invoice': miniTrade.pageMiniInvoice,
   'mini-mine': miniMine.pageMiniMine,
   'mini-wallet': miniMine.pageMiniWallet,
   'mini-points': miniMine.pageMiniPoints,
+  'mini-redeem': miniMine.pageMiniRedeem,
   'mini-privacy': miniMine.pageMiniPrivacy,
   'mini-msg': miniMine.pageMiniMsg,
   'mini-invite': miniMine.pageMiniInvite,
@@ -102,6 +113,7 @@ const PAGES = {
   'mini-book': miniLife.pageMiniBook,
   'mini-event': miniLife.pageMiniEvent,
   'mini-ceremony': miniLife.pageMiniCeremony,
+  'mini-custom': miniLife.pageMiniCeremony,
   'mini-limited': miniLife.pageMiniLimited,
   'mini-verify': miniLife.pageMiniVerify,
 };

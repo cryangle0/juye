@@ -67,7 +67,7 @@ export const bizActions = {
     flash(res);
     render();
   },
-  'book-slot'(el) { handleResult(D.bookSlot(ui.memberId || 'm2', el.dataset.id, 2)); },
+  'book-slot'(el) { handleResult(D.bookSlot(ui.memberId || 'm2', el.dataset.id, Number(val('f-people') || 2))); },
   'cancel-book'(el) { handleResult(D.cancelBook(el.dataset.id)); },
   'change-book'(el) {
     const other = getDb().slots.find((s) => s.id !== getDb().bookings.find((b) => b.id === el.dataset.id)?.slotId);
@@ -125,10 +125,15 @@ export const bizActions = {
   'ugc-reject'(el) { handleResult(D.ugcPass(el.dataset.id, false)); },
   'seg-coupon'() { handleResult(D.grantCoupon('m2', 'TPL2')); },
   'add-cart'(el) { handleResult(D.addCart(ui.memberId, el.dataset.id, 1)); },
+  'cart-plus'(el) { handleResult(D.changeCart(ui.memberId, el.dataset.id, 1)); },
+  'cart-minus'(el) { handleResult(D.changeCart(ui.memberId, el.dataset.id, -1)); },
+  'cart-remove'(el) { handleResult(D.removeCart(ui.memberId, el.dataset.id)); },
   checkout() {
     ui.couponId = val('f-coupon');
     ui.usePoints = document.getElementById('f-points') ? document.getElementById('f-points').checked : true;
-    const res = D.checkout(ui.memberId, ui.couponId, ui.usePoints);
+    ui.fulfill = val('f-fulfill') || ui.fulfill || '快递';
+    ui.payKind = val('f-paykind') || 'full';
+    const res = D.checkout(ui.memberId, ui.couponId, ui.usePoints, ui.fulfill, ui.payKind);
     if (flash(res)) {
       ui.orderId = res.orders[0].id;
       navigate('mini-pay');
@@ -136,14 +141,28 @@ export const bizActions = {
   },
   'pay-order'(el) {
     const id = el.dataset.id || ui.orderId;
-    withLoading('正在调起微信支付…', () => new Promise((r) => setTimeout(r, 420))).then(() => {
-      const res = D.payOrder(id);
+    const channel = el.dataset.channel || '微信';
+    withLoading('正在调起' + channel + '支付…', () => new Promise((r) => setTimeout(r, 420))).then(() => {
+      const res = D.payOrder(id, channel);
       if (flash(res)) navigate('mini-orders');
       else render();
     });
   },
   'cancel-order'(el) { handleResult(D.cancelUnpaid(el.dataset.id || ui.orderId), 'mini-cart'); },
+  'release-timeout'() { handleResult(D.releaseTimeout()); },
+  'apply-invoice'(el) {
+    handleResult(D.applyInvoice(el.dataset.id || ui.orderId, val('f-inv-kind') || '个人', val('f-inv-title'), val('f-inv-tax')));
+  },
+  'redeem-item'(el) { handleResult(D.redeemPoints(ui.memberId, el.dataset.id)); },
+  'grant-birthday'(el) { handleResult(D.grantBirthday(el.dataset.id || ui.memberId)); },
+  'expire-points'() { handleResult(D.expirePoints(ui.memberId || 'm2', 10)); },
+  'import-addr'(el) { handleResult(D.importAddresses(el.dataset.id, val('f-addr'))); },
+  'e-vat'() { handleResult(D.applyVat(ui.enterpriseId || 'E1', val('f-oid'))); },
+  'hang-vip'() { handleResult(D.hangVipPrice(ui.enterpriseId || 'E1', val('f-pid') || 'P11', val('f-vip') || 238)); },
+  'change-sign'(el) { handleResult(D.changeSignup(el.dataset.id, el.dataset.event)); },
+  'p-signup'(el) { handleResult(D.signupEvent(ui.merchantId, el.dataset.id)); },
   'invite-demo'() { handleResult(D.inviteAccept(ui.memberId, 'guest-new')); },
+  'invite-first'() { handleResult(D.simulateInviteFirstOrder(ui.memberId)); },
   'submit-review'() { handleResult(D.submitReview(ui.memberId, ui.productId, val('f-review') || '很好')); },
   'submit-ugc'() { handleResult(D.submitUgc(ui.memberId, val('f-ugc') || '打卡')); },
 };
