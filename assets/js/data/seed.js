@@ -2,7 +2,7 @@ import { MINI_MEMBERS } from './constants.js';
 
 export function seed() {
     return {
-      version: 4,
+      version: 5,
       now: '2026-09-17 14:30',
       config: {
         pointRate: 0.1,
